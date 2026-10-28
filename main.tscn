@@ -1,0 +1,214 @@
+[gd_scene format=3 uid="uid://b0qjjsnmh6emn"]
+
+[ext_resource type="Texture2D" uid="uid://ds1qo84y8way5" path="res://visual assets/skystarless.png" id="1_skystarless"]
+[ext_resource type="Texture2D" uid="uid://d2n5hc4njd25f" path="res://visual assets/skystarfield.png" id="2_skystarfield"]
+[ext_resource type="Texture2D" uid="uid://c1kmo131ifnbl" path="res://visual assets/pathbase.png" id="3_pathbase"]
+[ext_resource type="Texture2D" uid="uid://dnrkqpn80xg00" path="res://visual assets/paths.png" id="4_paths"]
+[ext_resource type="Texture2D" uid="uid://c2n10xb0xydtu" path="res://visual assets/moonbase.png" id="5_moonbase"]
+[ext_resource type="Texture2D" uid="uid://dwxop75owle6u" path="res://visual assets/moonface.png" id="6_moonface"]
+[ext_resource type="Texture2D" uid="uid://cvsn6jve3m2cb" path="res://visual assets/sound.png" id="7_sound"]
+[ext_resource type="Texture2D" uid="uid://0uijccgj1np2" path="res://visual assets/shop/UI/original.png" id="8_ui"]
+[ext_resource type="Texture2D" uid="uid://bxip64f5k2er6" path="res://visual assets/middlebutton.png" id="9_middlebutton"]
+[ext_resource type="Texture2D" uid="uid://lepohkt6c31h" path="res://visual assets/buttonL1.png" id="10_buttonl1"]
+[ext_resource type="Texture2D" uid="uid://ci6eb24102mnl" path="res://visual assets/buttonL2.png" id="11_buttonl2"]
+[ext_resource type="Texture2D" uid="uid://bhdxiu83xoonu" path="res://visual assets/buttonR1.png" id="12_buttonr1"]
+[ext_resource type="Texture2D" uid="uid://x0q0cm63ibai" path="res://visual assets/buttonR2.png" id="13_buttonr2"]
+[ext_resource type="Texture2D" uid="uid://ctbc4v0g7d6n2" path="res://visual assets/pauseglyph.png" id="14_pauseglyph"]
+[ext_resource type="Texture2D" uid="uid://bsnvw06ivjoul" path="res://visual assets/settings_glyph.png" id="15_settings_glyph"]
+[ext_resource type="Texture2D" uid="uid://dm3e64paonecp" path="res://visual assets/musicglyph.png" id="16_musicglyph"]
+[ext_resource type="Texture2D" uid="uid://dulfhpqp04pau" path="res://visual assets/shopglyph.png" id="17_shopglyph"]
+[ext_resource type="Script" uid="uid://bl2ofqh4kurms" path="res://scripts/humans.gd" id="18_humans"]
+[ext_resource type="Texture2D" uid="uid://csmw077p88mpd" path="res://visual assets/moonface2.png" id="19_moonface2"]
+[ext_resource type="Script" uid="uid://dbuv6y535utv5" path="res://scripts/button.gd" id="20_button"]
+[ext_resource type="Script" uid="uid://dx5xn0r55rpeo" path="res://scripts/music.gd" id="21_music"]
+[ext_resource type="Texture2D" uid="uid://6qs7l2pflbh2" path="res://visual assets/djbooth.png" id="22_djbooth"]
+[ext_resource type="Script" uid="uid://b1qfygfd8niuk" path="res://scripts/now_playing.gd" id="23_now_playing"]
+[ext_resource type="Script" uid="uid://ctiecdojunf83" path="res://scripts/pause.gd" id="23_pause"]
+[ext_resource type="Script" uid="uid://dft1bjg1bvc1t" path="res://scripts/settings.gd" id="24_settings"]
+[ext_resource type="Script" uid="uid://cuu4cm8v4ho3e" path="res://scripts/intro.gd" id="25_intro"]
+[ext_resource type="Script" uid="uid://vkgvepui7wvh" path="res://scripts/scratch.gd" id="26_scratch"]
+[ext_resource type="Script" uid="uid://da23oq3t88rlr" path="res://scripts/falling_stars.gd" id="27_falling_stars"]
+[ext_resource type="Script" uid="uid://bpl2bldtcdd20" path="res://scripts/shadows.gd" id="28_shadows"]
+[ext_resource type="Shader" uid="uid://c753gjlm2ebiw" path="res://scripts/stars.gdshader" id="29_stars"]
+[ext_resource type="Script" uid="uid://cfiaol6o0xtj0" path="res://scripts/moon.gd" id="30_moon"]
+[ext_resource type="Texture2D" uid="uid://bfwpnymts6iwi" path="res://visual assets/moonface3.png" id="31_moonface3"]
+[ext_resource type="Texture2D" uid="uid://c1yesgfpk0m8h" path="res://visual assets/moonface4.png" id="32_moonface4"]
+[ext_resource type="Script" uid="uid://dc3b52aidlgha" path="res://scripts/shop.gd" id="33_shop"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_stars"]
+shader = ExtResource("29_stars")
+shader_parameter/halo_color = Color(0.3, 0.38, 0.62, 1)
+shader_parameter/halo_period_min = 5.0
+shader_parameter/halo_period_max = 9.0
+shader_parameter/twinkle_period_min = 1.2
+shader_parameter/twinkle_period_max = 2.6
+shader_parameter/twinkle_low = 0.6
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_moonface"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_moonface")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_moonface2")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("31_moonface3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_moonface4")
+}],
+"loop": 1,
+"name": &"talk",
+"speed": 8.0
+}]
+
+[node name="Main" type="Node2D" unique_id=287739728]
+texture_filter = 1
+scale = Vector2(10, 10)
+
+[node name="SkyStarless" type="Sprite2D" parent="." unique_id=364937383]
+visible = false
+texture = ExtResource("1_skystarless")
+centered = false
+
+[node name="SkyStarfield" type="Sprite2D" parent="." unique_id=2060372946]
+material = SubResource("ShaderMaterial_stars")
+texture = ExtResource("2_skystarfield")
+centered = false
+
+[node name="FallingStars" type="Sprite2D" parent="." unique_id=1965853549 node_paths=PackedStringArray("moon")]
+script = ExtResource("27_falling_stars")
+moon = NodePath("../MoonBase")
+
+[node name="PathBase" type="Sprite2D" parent="." unique_id=2087727069]
+texture = ExtResource("3_pathbase")
+centered = false
+
+[node name="Paths" type="Sprite2D" parent="." unique_id=1704621162]
+texture = ExtResource("4_paths")
+centered = false
+
+[node name="MoonBase" type="Sprite2D" parent="." unique_id=597823611]
+texture = ExtResource("5_moonbase")
+centered = false
+
+[node name="MoonFace" type="AnimatedSprite2D" parent="." unique_id=1124066347]
+sprite_frames = SubResource("SpriteFrames_moonface")
+autoplay = "default"
+centered = false
+
+[node name="Shadows" type="CanvasGroup" parent="." unique_id=1338131147 node_paths=PackedStringArray("sound", "humans")]
+script = ExtResource("28_shadows")
+sound = NodePath("../Sound")
+humans = NodePath("../Humans")
+
+[node name="Sound" type="Sprite2D" parent="." unique_id=1509152126]
+texture = ExtResource("7_sound")
+centered = false
+
+[node name="Humans" type="Node2D" parent="." unique_id=97215492 node_paths=PackedStringArray("path_base", "paths", "sound", "ui", "music", "booth")]
+y_sort_enabled = true
+script = ExtResource("18_humans")
+path_base = NodePath("../PathBase")
+paths = NodePath("../Paths")
+sound = NodePath("../Sound")
+ui = NodePath("../UI")
+music = NodePath("../Music")
+booth = NodePath("Booth")
+
+[node name="Booth" type="Sprite2D" parent="Humans" unique_id=1873402215]
+position = Vector2(0, 96)
+texture = ExtResource("22_djbooth")
+centered = false
+offset = Vector2(0, -96)
+
+[node name="UI" type="Sprite2D" parent="." unique_id=906986358]
+texture = ExtResource("8_ui")
+centered = false
+
+[node name="MiddleButton" type="Sprite2D" parent="." unique_id=1238436655]
+texture = ExtResource("9_middlebutton")
+centered = false
+script = ExtResource("20_button")
+
+[node name="NowPlaying" type="Node2D" parent="MiddleButton" unique_id=419283776 node_paths=PackedStringArray("music")]
+script = ExtResource("23_now_playing")
+music = NodePath("../../Music")
+
+[node name="ButtonL1" type="Sprite2D" parent="." unique_id=386012359]
+texture = ExtResource("10_buttonl1")
+centered = false
+script = ExtResource("20_button")
+
+[node name="PauseGlyph" type="Sprite2D" parent="ButtonL1" unique_id=824899738]
+texture = ExtResource("14_pauseglyph")
+centered = false
+
+[node name="ButtonL2" type="Sprite2D" parent="." unique_id=472519365]
+texture = ExtResource("11_buttonl2")
+centered = false
+script = ExtResource("20_button")
+
+[node name="SettingsGlyph" type="Sprite2D" parent="ButtonL2" unique_id=30753752]
+texture = ExtResource("15_settings_glyph")
+centered = false
+
+[node name="ButtonR1" type="Sprite2D" parent="." unique_id=103173040]
+texture = ExtResource("12_buttonr1")
+centered = false
+script = ExtResource("20_button")
+
+[node name="ShopGlyph" type="Sprite2D" parent="ButtonR1" unique_id=523078906]
+texture = ExtResource("17_shopglyph")
+centered = false
+
+[node name="ButtonR2" type="Sprite2D" parent="." unique_id=827546495]
+texture = ExtResource("13_buttonr2")
+centered = false
+script = ExtResource("20_button")
+
+[node name="MusicGlyph" type="Sprite2D" parent="ButtonR2" unique_id=232837720]
+texture = ExtResource("16_musicglyph")
+centered = false
+
+[node name="Moon" type="Node2D" parent="." unique_id=466080641 node_paths=PackedStringArray("base", "face", "intro")]
+script = ExtResource("30_moon")
+base = NodePath("../MoonBase")
+face = NodePath("../MoonFace")
+intro = NodePath("../Intro")
+
+[node name="Music" type="Node" parent="." unique_id=1650293184 node_paths=PackedStringArray("button")]
+script = ExtResource("21_music")
+button = NodePath("../ButtonR2")
+
+[node name="Pause" type="Node" parent="." unique_id=831345032 node_paths=PackedStringArray("button", "glyph")]
+script = ExtResource("23_pause")
+button = NodePath("../ButtonL1")
+glyph = NodePath("../ButtonL1/PauseGlyph")
+
+[node name="Settings" type="Node" parent="." unique_id=1296487318 node_paths=PackedStringArray("button", "music", "shadows", "humans")]
+script = ExtResource("24_settings")
+button = NodePath("../ButtonL2")
+music = NodePath("../Music")
+shadows = NodePath("../Shadows")
+humans = NodePath("../Humans")
+
+[node name="Scratch" type="Node" parent="." unique_id=1922347651 node_paths=PackedStringArray("music", "humans")]
+script = ExtResource("26_scratch")
+music = NodePath("../Music")
+humans = NodePath("../Humans")
+
+[node name="Shop" type="Node" parent="." unique_id=2066994295 node_paths=PackedStringArray("button", "ui")]
+script = ExtResource("33_shop")
+button = NodePath("../ButtonR1")
+ui = NodePath("../UI")
+
+[node name="Intro" type="CanvasLayer" parent="." unique_id=834376937]
+script = ExtResource("25_intro")

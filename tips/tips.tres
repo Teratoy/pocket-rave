@@ -1,0 +1,296 @@
+[gd_resource type="Resource" script_class="MoonTipLibrary" format=3 uid="uid://b34v8u25tbfsv"]
+
+[ext_resource type="Script" uid="uid://chmbh8r4y1l8v" path="res://addons/moon_tips/tip_library.gd" id="1_7qeom"]
+[ext_resource type="Script" uid="uid://bfdtttfk2oj12" path="res://addons/moon_tips/tip.gd" id="2_u0mcp"]
+
+[sub_resource type="Resource" id="Resource_6pkc2"]
+script = ExtResource("2_u0mcp")
+id = "a099d0720002d0b7"
+text = "Welcome to my little party! choose a DJ to start it properly."
+kind = 1
+trigger = "launch"
+
+[sub_resource type="Resource" id="Resource_7g4f4"]
+script = ExtResource("2_u0mcp")
+id = "c566ee6d17792834"
+text = "Dont be scared to ask for help if you need it."
+
+[sub_resource type="Resource" id="Resource_jwlww"]
+script = ExtResource("2_u0mcp")
+id = "e1354d0418afcac7"
+text = "You never know what is going on in others' people lives."
+
+[sub_resource type="Resource" id="Resource_ncma8"]
+script = ExtResource("2_u0mcp")
+id = "aafa21791ac54b50"
+text = "i kissed the Earth once, we've been in love since then."
+chance = 0.3
+
+[sub_resource type="Resource" id="Resource_jfc5o"]
+script = ExtResource("2_u0mcp")
+id = "035b0cf71f306e11"
+text = "Leave the mixing to the DJ."
+
+[sub_resource type="Resource" id="Resource_35i7k"]
+script = ExtResource("2_u0mcp")
+id = "844737ef200fc4cf"
+text = "Lol!"
+chance = 0.6
+
+[sub_resource type="Resource" id="Resource_cvml6"]
+script = ExtResource("2_u0mcp")
+id = "af4b30fa27b96dd2"
+text = "Fart!"
+chance = 0.4
+
+[sub_resource type="Resource" id="Resource_e18xh"]
+script = ExtResource("2_u0mcp")
+id = "0d7bf70d295f50fa"
+text = "I dont have any info!"
+chance = 0.9
+
+[sub_resource type="Resource" id="Resource_cnj18"]
+script = ExtResource("2_u0mcp")
+id = "d548d142b0ca7cdf"
+text = "Touch grass."
+
+[sub_resource type="Resource" id="Resource_o8333"]
+script = ExtResource("2_u0mcp")
+id = "57ac5645b3d7c481"
+text = "Always bring your towel."
+chance = 0.2
+
+[sub_resource type="Resource" id="Resource_yj1ue"]
+script = ExtResource("2_u0mcp")
+id = "932fdb61c0e57060"
+text = "You are talking to the visual depiction of the moon. 
+
+
+You must be tripping!"
+chance = 0.8
+
+[sub_resource type="Resource" id="Resource_b0xk6"]
+script = ExtResource("2_u0mcp")
+id = "9b275ce4cb28524f"
+text = "What is the place of the unconscious in a machine-run society?"
+
+[sub_resource type="Resource" id="Resource_co4wa"]
+script = ExtResource("2_u0mcp")
+id = "3734a29be29e5a58"
+text = "Dont choke on your puke."
+
+[sub_resource type="Resource" id="Resource_1qu8y"]
+script = ExtResource("2_u0mcp")
+id = "7ddff389e393a597"
+text = "wash your butt."
+
+[sub_resource type="Resource" id="Resource_733st"]
+script = ExtResource("2_u0mcp")
+id = "2511301de4288bb4"
+text = "I miss the 90's."
+chance = 0.6
+
+[sub_resource type="Resource" id="Resource_l74lh"]
+script = ExtResource("2_u0mcp")
+id = "213192a4e81343f4"
+text = "Self-sufficiency is the greatest of all wealth."
+
+[sub_resource type="Resource" id="Resource_50edf"]
+script = ExtResource("2_u0mcp")
+id = "96d1707efce224e2"
+text = "Free Zeno!"
+
+[sub_resource type="Resource" id="Resource_6le4w"]
+script = ExtResource("2_u0mcp")
+id = "7a279a5cfe2ad8ad"
+text = "Tie your shoes."
+
+[sub_resource type="Resource" id="Resource_2hn7b"]
+script = ExtResource("2_u0mcp")
+id = "63c61883f3907a06"
+text = "There is music you never hear unless you play it yourself."
+chance = 0.6
+
+[sub_resource type="Resource" id="Resource_3gbiv"]
+script = ExtResource("2_u0mcp")
+id = "d92a5aa90002d0c8"
+text = "Hello!"
+kind = 1
+trigger = "moon_touched"
+
+[sub_resource type="Resource" id="Resource_gdr0o"]
+script = ExtResource("2_u0mcp")
+id = "4054eb6f0300d967"
+text = "Ouch."
+chance = 1.3
+
+[sub_resource type="Resource" id="Resource_k8cv8"]
+script = ExtResource("2_u0mcp")
+id = "46e6e08a040a0f17"
+text = "Stop touching me!"
+chance = 0.2
+
+[sub_resource type="Resource" id="Resource_b61dp"]
+script = ExtResource("2_u0mcp")
+id = "6690a06a09adf634"
+text = "Responsibility is the price of freedom."
+
+[sub_resource type="Resource" id="Resource_5w0t8"]
+script = ExtResource("2_u0mcp")
+id = "a184d2c60a0f1746"
+text = "Do not take life too seriously; you will never get out of it alive."
+
+[sub_resource type="Resource" id="Resource_iu4af"]
+script = ExtResource("2_u0mcp")
+id = "bd21bfd41072edc4"
+text = "Experience is the name everyone gives to his mistakes."
+
+[sub_resource type="Resource" id="Resource_2y55j"]
+script = ExtResource("2_u0mcp")
+id = "a27dd51614b8407c"
+text = "There are people who laugh to show their fine teeth
+and there are those who cry to show their good hearts."
+
+[sub_resource type="Resource" id="Resource_fdc76"]
+script = ExtResource("2_u0mcp")
+id = "345eab550002d0cc"
+text = "DJ {dj} is going to play now!"
+kind = 1
+trigger = "dj_called"
+every_time = true
+
+[sub_resource type="Resource" id="Resource_xy8ti"]
+script = ExtResource("2_u0mcp")
+id = "c489ca8e0002d0cf"
+text = "They will hear this from afar!"
+kind = 1
+trigger = "set_started"
+
+[sub_resource type="Resource" id="Resource_ilsop"]
+script = ExtResource("2_u0mcp")
+id = "e389df5f0002d0d2"
+text = "are you too a DJ?"
+kind = 1
+trigger = "scratch"
+
+[sub_resource type="Resource" id="Resource_fmiuo"]
+script = ExtResource("2_u0mcp")
+id = "eaccd8de0002d0d5"
+text = "Nice set. Who's next?"
+kind = 1
+trigger = "set_ended"
+
+[sub_resource type="Resource" id="Resource_4b68u"]
+script = ExtResource("2_u0mcp")
+id = "b3d527440002d0d8"
+text = "Pause..."
+kind = 1
+trigger = "paused"
+
+[sub_resource type="Resource" id="Resource_rfppp"]
+script = ExtResource("2_u0mcp")
+id = "7ff8e22c0002d0da"
+text = "Fresh tracks!"
+kind = 1
+trigger = "tracks_imported"
+
+[sub_resource type="Resource" id="Resource_o3s26"]
+script = ExtResource("2_u0mcp")
+id = "32c85ebd0002d0e0"
+text = "Miao."
+chance = 0.9
+
+[sub_resource type="Resource" id="Resource_xpa68"]
+script = ExtResource("2_u0mcp")
+id = "bbc4d9485680b8c0"
+text = "I have the poor habit of repeating myself all over again..."
+chance = 0.1
+
+[sub_resource type="Resource" id="Resource_4mot0"]
+script = ExtResource("2_u0mcp")
+id = "56ea456b58cf4b1a"
+text = "KTN gang."
+chance = 0.2
+
+[sub_resource type="Resource" id="Resource_b3bkv"]
+script = ExtResource("2_u0mcp")
+id = "4619f53c5a72ee85"
+text = "Dont take candies from strangers. Unless..."
+
+[sub_resource type="Resource" id="Resource_wjq2c"]
+script = ExtResource("2_u0mcp")
+id = "53cef1445f5f74f8"
+text = "Cops are legally allowed to lie."
+
+[sub_resource type="Resource" id="Resource_fxple"]
+script = ExtResource("2_u0mcp")
+id = "8d958e11628d6014"
+text = "Charge your phone."
+
+[sub_resource type="Resource" id="Resource_1oh5r"]
+script = ExtResource("2_u0mcp")
+id = "a3f951ff63c89fcf"
+text = "Dont forget you have to eat."
+
+[sub_resource type="Resource" id="Resource_sjud2"]
+script = ExtResource("2_u0mcp")
+id = "9647852364d91916"
+text = "If the music is too loud wear some earplugs."
+
+[sub_resource type="Resource" id="Resource_7qeom"]
+script = ExtResource("2_u0mcp")
+id = "4109f09c15af426e"
+text = "Purrrrrr..."
+chance = 0.6
+
+[sub_resource type="Resource" id="Resource_jk338"]
+script = ExtResource("2_u0mcp")
+id = "5d4996970002d0e2"
+text = "Wicked. Wicked."
+chance = 1.1
+
+[sub_resource type="Resource" id="Resource_u0mcp"]
+script = ExtResource("2_u0mcp")
+id = "15d7a3231dc9631b"
+text = "Pick up your trash!"
+
+[sub_resource type="Resource" id="Resource_g1ma3"]
+script = ExtResource("2_u0mcp")
+id = "68945f7c234f35ee"
+text = "Be careful what you share online."
+
+[sub_resource type="Resource" id="Resource_aj2eh"]
+script = ExtResource("2_u0mcp")
+id = "df29858d0002d0e4"
+text = "Go touch the DJ instead!"
+
+[sub_resource type="Resource" id="Resource_ryxg5"]
+script = ExtResource("2_u0mcp")
+id = "a39cc0c50002d0e7"
+text = "Respect the place and the people."
+
+[sub_resource type="Resource" id="Resource_wjw3p"]
+script = ExtResource("2_u0mcp")
+id = "b5e81a870002d0e9"
+text = "Hydrate. Unlike me..."
+
+[sub_resource type="Resource" id="Resource_hl1yx"]
+script = ExtResource("2_u0mcp")
+id = "37f275820002d0ec"
+text = "Remember to check on your friends once in a while."
+
+[sub_resource type="Resource" id="Resource_fqglv"]
+script = ExtResource("2_u0mcp")
+id = "018ee6450002d0ee"
+text = "Jungle is massive."
+chance = 0.5
+
+[sub_resource type="Resource" id="Resource_dnyjv"]
+script = ExtResource("2_u0mcp")
+id = "706a69c50002d0f1"
+text = "Dont touch me like that."
+chance = 0.5
+
+[resource]
+script = ExtResource("1_7qeom")
+tips = Array[ExtResource("2_u0mcp")]([SubResource("Resource_6pkc2"), SubResource("Resource_7g4f4"), SubResource("Resource_jwlww"), SubResource("Resource_ncma8"), SubResource("Resource_jfc5o"), SubResource("Resource_35i7k"), SubResource("Resource_cvml6"), SubResource("Resource_e18xh"), SubResource("Resource_cnj18"), SubResource("Resource_o8333"), SubResource("Resource_yj1ue"), SubResource("Resource_b0xk6"), SubResource("Resource_co4wa"), SubResource("Resource_1qu8y"), SubResource("Resource_733st"), SubResource("Resource_l74lh"), SubResource("Resource_50edf"), SubResource("Resource_6le4w"), SubResource("Resource_2hn7b"), SubResource("Resource_3gbiv"), SubResource("Resource_gdr0o"), SubResource("Resource_k8cv8"), SubResource("Resource_b61dp"), SubResource("Resource_5w0t8"), SubResource("Resource_iu4af"), SubResource("Resource_2y55j"), SubResource("Resource_fdc76"), SubResource("Resource_xy8ti"), SubResource("Resource_ilsop"), SubResource("Resource_fmiuo"), SubResource("Resource_4b68u"), SubResource("Resource_rfppp"), SubResource("Resource_o3s26"), SubResource("Resource_xpa68"), SubResource("Resource_4mot0"), SubResource("Resource_b3bkv"), SubResource("Resource_wjq2c"), SubResource("Resource_fxple"), SubResource("Resource_1oh5r"), SubResource("Resource_sjud2"), SubResource("Resource_7qeom"), SubResource("Resource_jk338"), SubResource("Resource_u0mcp"), SubResource("Resource_g1ma3"), SubResource("Resource_aj2eh"), SubResource("Resource_ryxg5"), SubResource("Resource_wjw3p"), SubResource("Resource_hl1yx"), SubResource("Resource_fqglv"), SubResource("Resource_dnyjv")])

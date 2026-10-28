@@ -1,0 +1,16 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Android plugin build files
+android_plugin/.gradle/
+android_plugin/**/build/
+android_plugin/local.properties
+
+# Export output and local tooling
+/build/
+/.claude/
+
+# Bundled tracks are not redistributed
+/music/**/*.mp3
+/music/**/*.mp3.import

@@ -1,0 +1,31 @@
+plugins {
+    id "com.android.library"
+}
+
+android {
+    namespace = "org.pocketrave.bgmusic"
+    compileSdk = 36  // Match the Godot Android build template (android/build/config.gradle).
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // Provided by the Godot app at runtime.
+    compileOnly "org.godotengine:godot:4.7.2.stable"
+}
+
+// Builds the AARs and copies them into the Godot addon.
+tasks.register("copyToAddon", Copy) {
+    dependsOn "assembleDebug", "assembleRelease"
+    from layout.buildDirectory.dir("outputs/aar")
+    include "*.aar"
+    into rootProject.file("../addons/background_music/bin")
+    rename "plugin-(.*)\\.aar", "BackgroundMusic-\$1.aar"
+}
