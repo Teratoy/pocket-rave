@@ -2,11 +2,16 @@ extends AnimatedSprite2D
 ## One human. Its position is its base pixel, the only pixel that collides.
 ## Movement is decided by the Humans manager.
 
-enum State { WAITING, WALKING, IDLE, DANCING, GREETING, HANDOFF, RECEIVING, TAKING }
-## Why the human is walking: what it does on arrival.
-enum Goal { STROLL, DANCE, VISIT_DJ, HANDOFF, TAKE_DEAL, LEAVE }
+## ACTING is one of the manifest's own actions (see Humans._start_custom).
+enum State { WAITING, WALKING, IDLE, DANCING, GREETING, HANDOFF, RECEIVING, TAKING, ACTING }
+## Why the human is walking: what it does on arrival. ACT walks as one of
+## the manifest's own actions and ends it on arrival.
+enum Goal { STROLL, DANCE, VISIT_DJ, HANDOFF, TAKE_DEAL, LEAVE, ACT }
 
 var cell: Vector2i
+## The skin it was drawn with, and the action it is playing one take of.
+var skin: String
+var action: StringName
 var state := State.WAITING
 var goal := Goal.STROLL
 var timer := 0.0
@@ -24,8 +29,11 @@ var rest := 0.0
 
 ## Seconds until the human will wave at someone again.
 var greet_cooldown := 0.0
-## State to go back to once the wave is over.
+## State to go back to once the wave (or one of the manifest's own
+## actions) is over.
 var resume_state := State.IDLE
+## The manifest's own action a human with goal ACT walks as.
+var walk_as: StringName
 
 ## Standing by the booth, deciding whether to wave at the DJ.
 var wave_dj := false

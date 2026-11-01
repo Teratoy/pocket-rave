@@ -1,9 +1,6 @@
 {
 	"version": 1,
-	"frame_size": [
-		5,
-		6
-	],
+	"frame_size": [5, 6],
 	"palette": {
 		"#": "000000",
 		"a": "b9b9b9"
@@ -17,7 +14,7 @@
 						{
 							"name": "a",
 							"weight": 1,
-							"fps": 5.0,
+							"fps": 5,
 							"loop": true,
 							"frames": [
 								{
@@ -40,7 +37,7 @@
 						{
 							"name": "a",
 							"weight": 1,
-							"fps": 8.0,
+							"fps": 8,
 							"loop": true,
 							"frames": [
 								{
@@ -96,7 +93,7 @@
 						{
 							"name": "a",
 							"weight": 1,
-							"fps": 8.0,
+							"fps": 8,
 							"loop": true,
 							"frames": [
 								{
@@ -152,7 +149,7 @@
 						{
 							"name": "a",
 							"weight": 1,
-							"fps": 0.0,
+							"fps": 0,
 							"loop": true,
 							"manual": true,
 							"frames": [
@@ -209,7 +206,7 @@
 						{
 							"name": "a",
 							"weight": 1,
-							"fps": 8.0,
+							"fps": 8,
 							"loop": false,
 							"frames": [
 								{
@@ -298,7 +295,7 @@
 						{
 							"name": "a",
 							"weight": 1,
-							"fps": 5.0,
+							"fps": 5,
 							"loop": true,
 							"frames": [
 								{
@@ -321,7 +318,7 @@
 						{
 							"name": "a",
 							"weight": 1,
-							"fps": 8.0,
+							"fps": 8,
 							"loop": false,
 							"frames": [
 								{
@@ -355,7 +352,7 @@
 						{
 							"name": "a",
 							"weight": 1,
-							"fps": 5.0,
+							"fps": 5,
 							"loop": true,
 							"frames": [
 								{

@@ -274,8 +274,16 @@ func _on_low_bit_changed(on: bool) -> void:
 
 func _process(_delta: float) -> void:
 	# The native player runs the set on its own; follow it here.
-	if _native and _live and _native.isFinished():
+	if not _native or not _live:
+		return
+	if _native.isFinished():
 		stop()
+		return
+	# It moves on to the next track by itself, so announce it from here.
+	var i: int = _native.getTrackIndex()
+	if i >= 0 and i < _native_tracks.size() and _native_tracks[i] != _track:
+		_track = _native_tracks[i]
+		_announce_track()
 
 
 func _notification(what: int) -> void:

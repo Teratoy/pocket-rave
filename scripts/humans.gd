@@ -15,148 +15,29 @@ const Human := preload("res://scripts/human.gd")
 const TINT_SHADER := preload("res://scripts/human_tint.gdshader")
 ## Every human animation: frames as palette rows, with fps and looping.
 const MANIFEST := "res://humans/humans.json"
-const SKIN := "human1"
+const Tuning := preload("res://scripts/human_tuning.gd")
+## The crowd's chances, timings and distances (see human_tuning.gd).
+const TUNING_FILE := "res://humans/tuning.tres"
 
-## The crowd starts with at least n humans once the sound has 3n² - 5n + 3
-## pixels (1 → 1, 5 → 2, 15 → 3, 31 → 4...), plus up to this many times n more.
-const START_EXTRA_PER := 5
-## Walkable pixels above the UI per human; sets how big the crowd can get.
-const AREA_PER_HUMAN := 120
-## In silence, each human's chance per second to head home grows by this
-## much for every second without music, up to LEAVE_RATE_MAX.
-const LEAVE_RATE_GROWTH := 1.5e-4
-const LEAVE_RATE_MAX := 0.05
-## While music plays, humans arrive at this many per second, plus
-## ARRIVE_PER_HUMAN for each one already there: a crowd draws a crowd.
-## Someone always comes when nobody is there.
-const ARRIVE_BASE := 0.02
-const ARRIVE_PER_HUMAN := 0.016
-## Arrivals and leavings are both scaled by a mood picked between
-## 1 / MOOD_SWING and MOOD_SWING, held for MOOD_TIME seconds.
-const MOOD_SWING := 3.0
-const MOOD_TIME := Vector2(20.0, 60.0)
-const STEP_TIME := 0.2
-const IDLE_TIME := Vector2(1.0, 4.0)
-const SPAWN_DELAY := 4.0
-## Seconds a human waits before trying again when every spawn spot is taken.
-const SPAWN_RETRY := Vector2(0.3, 1.0)
-const GROUP_CHANCE := 0.7
-const GROUP_RADIUS := Vector2i(2, 5)
-const GIVE_UP_AFTER := 5
 const MAX_SHADE := 254
 ## Base pixel offset inside the 5x6 sprite (bottom centre).
 const BASE_OFFSET := Vector2(-2, -5)
 
-## Chance to dance = base + per_dancer * dancers, capped.
-const DANCE_CHANCE_BASE := 0.10
-const DANCE_CHANCE_PER_DANCER := 0.15
-const DANCE_CHANCE_MAX := 0.80
-const DANCE_TIME := Vector2(5.0, 15.0)
-## Dancing wears the spot under the dancer once per this many seconds.
-const DANCE_WEAR_TIME := 1.0
-## Dance spots are within this many pixels of the sound; the floor grows by
-## DANCE_RADIUS_PER_HUMAN for each human on screen, up to DANCE_RADIUS_MAX
-## (kept under REST_DISTANCE so resting humans stay off the floor).
-const DANCE_RADIUS := 30.0
-const DANCE_RADIUS_PER_HUMAN := 0.5
-const DANCE_RADIUS_MAX := 45.0
-## Preferred gap between dancers; shrinks by one per extra dancer.
-const DANCE_SPACING_MAX := 8.0
-const DANCE_SPACING_MIN := 3.0
-const CROWD_WEIGHT := 2.0
-## Each pick wants to be this far from the sound, as a fraction of
-## the current dance radius, skewed toward the front; keeps the crowd from forming rings.
-const DANCE_REACH_MAX := 0.7
-## Each neighbour's gap is the spacing scaled by a random factor in this
-## range, so some dance in pairs and others keep their distance.
-const DANCE_GAP_JITTER := Vector2(0.4, 1.5)
-## Random score noise in pixels; breaks the lattice the crowding term forms.
-const DANCE_SCORE_NOISE := 4.0
-## Strolling, not racing: a step costs 1 + STROLL_PULL / clearance, where
-## clearance is the distance to the nearest edge or obstacle. Walkers drift
-## toward the middle of open ground instead of shaving corners.
-const STROLL_PULL := 4.0
-
-const TIRED_AFTER := 30.0
-const REST_TIME := 20.0
-const TIRED_IDLE_TIME := Vector2(4.0, 8.0)
-## Tired humans keep at least this far from the sound.
-const REST_DISTANCE := 50.0
-const REST_WANDER := 6
-
-## Humans this close (in pixels) to a walker who just stepped wave at each other.
-const GREET_RADIUS := 3.0
-## Seconds a human waits before waving again.
-const GREET_COOLDOWN := Vector2(15.0, 30.0)
-
-## Each human is brightened by up to this fraction at spawn, at the
-## default dresscode variation, so no two look quite alike.
-const COLOR_VARIATION := 0.20
 ## The DJ walks in along this many rows below the booth, then up to it.
 const DJ_LANE_DROP := 2
 ## Cells off either side of the grid where DJs enter and leave.
 const DJ_OFFSCREEN := 3
 
-## Chance an idle human goes to check on the DJ while one is at the booth.
-const DJ_VISIT_CHANCE := 0.05
-## Visitors stand this far (in pixels) to either side of the DJ...
-const DJ_VISIT_SPREAD := 5
-## ...and up to this many rows below the space kept clear around the booth.
-const DJ_VISIT_DEPTH := 2
-## Seconds a visitor watches the DJ before maybe waving.
-const DJ_VISIT_LOOK := Vector2(1.0, 3.0)
-const DJ_VISIT_WAVE_CHANCE := 0.6
-## At most this many humans stand (or are headed) around the booth,
-## whether visiting, dancing or idling there.
-const DJ_CROWD_MAX := 3
 ## How far around the booth's clear space counts as "around the DJ".
 const DJ_CROWD_MARGIN := 1
-## While the set plays, the DJ holds each random DJ frame this many seconds.
-const DJ_FRAME_TIME := Vector2(1.0, 4.0)
 ## Pixels around the booth and DJ that still count as touching them.
 const SCRATCH_SLACK := 1
 ## Humans below the booth may stand this many pixels closer than the
 ## point where their sprite would touch the booth or DJ.
 const BOOTH_BOTTOM_SLACK := 2
-
-## One human in this many is a dealer. They look like everyone else.
-const DEALER_EVERY := 15
-## Dealers wave this many times as often, and this many times as fast.
-const DEALER_GREET_RATE := 2.0
-## Chance a dealer's wave ends with a deal handed over.
-const DEAL_CHANCE := 0.35
-## Seconds either side waits at the handoff for the other before giving up.
-const HANDOFF_WAIT := 3.0
-## Seconds the receiver shows the deal in hand.
-const DEAL_RECEIVE_TIME := 0.5
-## Chance an idle human holding a deal takes it.
-const DEAL_TAKE_CHANCE := 0.5
-## Chance someone on the dance floor walks off it before taking the deal.
-const DEAL_LEAVE_FLOOR_CHANCE := 0.9
-## Taking the deal: in hand, brought in, then done.
-const DEAL_HOLD_TIME := 3.0
-const DEAL_TIME := 2.0
-
-const ERRATIC_TIME := Vector2(13.0, 17.0)
-## Each erratic step takes this many times STEP_TIME, picked per step.
-const ERRATIC_STEP := Vector2(0.3, 3.0)
-const ERRATIC_IDLE_TIME := Vector2(0.5, 4.0)
-const ERRATIC_DANCE_TIME := Vector2(1.0, 6.0)
-## Erratic humans wave at someone this close (in pixels), or at nobody.
-const ERRATIC_GREET_RADIUS := 8.0
-## Chance a human is tired once the erratic spell wears off.
-const ERRATIC_TIRED_CHANCE := 0.5
-
-## Chance per step that a walker veers off its path instead. Tired ones
-## drift 45 degrees aside; erratic ones may also lurch fully sideways.
-const TIRED_WOBBLE_CHANCE := 0.15
-const ERRATIC_WOBBLE_CHANCE := 0.35
-
-## Chance a human also spawns with a strong random colour, at the
-## default dresscode variation.
-const TINT_CHANCE := 0.04
-## Brightness of that colour (0..1).
-const TINT_STRENGTH := 0.8
+## How far (in pixels) a human strays doing one of the manifest's own
+## actions that wanders ("move": "wander").
+const ACT_WANDER := 8
 
 ## Dresscodes: the colour every new human wears, by name. BLACK is the
 ## sprites' own colour.
@@ -173,11 +54,9 @@ const DRESSCODES := {
 	"PINK": Color(0.8, 0.0, 0.5),
 }
 ## How much new humans stray from the dresscode (0..1). At the default the
-## lift and chance of a random colour are COLOR_VARIATION and TINT_CHANCE;
-## the lift grows with it, the chance with its square.
+## lift and chance of a random colour are tuning.color_variation and
+## tuning.tint_chance; the lift grows with it, the chance with its square.
 const DEFAULT_VARIATION := 0.25
-## A coloured dresscode's hue strays by up to this much at full variation.
-const DRESSCODE_HUE_SPREAD := 0.15
 const SETTINGS_FILE := "user://settings.cfg"
 
 @export var path_base: Sprite2D
@@ -186,6 +65,8 @@ const SETTINGS_FILE := "user://settings.cfg"
 @export var ui: Sprite2D
 @export var music: Node
 @export var booth: Sprite2D
+
+var tuning: Tuning = load(TUNING_FILE)
 
 var _base_img: Image
 var _sound_img: Image
@@ -201,7 +82,16 @@ var _sound_dist := PackedFloat32Array()
 var _dance_spots: Array[Vector2i] = []
 var _occupied := {}
 var _humans: Array[Human] = []
-var _frames: SpriteFrames
+## Per skin: its SpriteFrames, its spawn weight, and for each action the
+## takes to pick from as [animation, weight] pairs.
+var _skins := {}
+## Skins to spawn humans in, as [skin, weight] pairs.
+var _skin_picks: Array = []
+## The manifest's own actions (its "behaviours"), by what sets them off:
+## trigger -> [[action, behaviour], ...], tried in order.
+var _custom := {}
+## The first skin in the manifest; its idle pose shapes the booth's no-go cells.
+var _base_skin: String
 ## The booth plus room so no sprite overlaps its box; the visitor spots
 ## and the zone around the DJ are measured from it.
 var _booth_rect: Rect2i
@@ -213,7 +103,7 @@ var _booth_cells := {}
 ## humans that have entered, the other also crosses under it.
 var _grid_above: AStarGrid2D
 var _grid_any: AStarGrid2D
-## Around the booth, where only DJ_CROWD_MAX humans may be.
+## Around the booth, where only tuning.dj_crowd_max humans may be.
 var _dj_zone: Rect2i
 ## Where the DJ stands: the booth's bottom centre.
 var _dj_spot: Vector2i
@@ -228,7 +118,7 @@ var _max_humans: int
 var _silence := 0.0
 var _mood := 1.0
 var _mood_left := 0.0
-## Humans ever spawned; every DEALER_EVERY-th is a dealer.
+## Humans ever spawned; every tuning.dealer_every-th is a dealer.
 var _spawned := 0
 ## Humans that walked off this frame, freed once the frame's loop is done.
 var _gone: Array[Human] = []
@@ -269,7 +159,7 @@ func _ready() -> void:
 			-int(BASE_OFFSET.x), 0, -int(BASE_OFFSET.x),
 			-int(BASE_OFFSET.y) - BOOTH_BOTTOM_SLACK)
 	_dj_zone = _booth_rect.grow(DJ_CROWD_MARGIN)
-	_frames = _load_frames(SKIN)
+	_load_skins(JSON.parse_string(FileAccess.get_file_as_string(MANIFEST)))
 	_build_booth_cells(booth_used)
 	_build_sound_map()
 	_grid_above = _make_grid(true)
@@ -289,12 +179,12 @@ func _process(delta: float) -> void:
 			h.dance_left -= delta
 		elif h.tired:
 			h.rest += delta
-			if h.rest >= REST_TIME:
+			if h.rest >= tuning.rest_time:
 				h.tired = false
 				h.fatigue = 0.0
 		if h.erratic > 0.0:
 			h.erratic -= delta
-			if h.erratic <= 0.0 and randf() < ERRATIC_TIRED_CHANCE:
+			if h.erratic <= 0.0 and randf() < tuning.erratic_tired_chance:
 				h.tired = true
 				h.rest = 0.0
 		h.greet_cooldown -= delta
@@ -307,7 +197,7 @@ func _process(delta: float) -> void:
 					_pick_entry_target(h)
 					_start_walking(h, Human.Goal.STROLL)
 				else:
-					h.timer = randf_range(SPAWN_RETRY.x, SPAWN_RETRY.y)
+					h.timer = randf_range(tuning.spawn_retry.x, tuning.spawn_retry.y)
 			Human.State.WALKING:
 				_step(h)
 			Human.State.IDLE:
@@ -322,6 +212,8 @@ func _process(delta: float) -> void:
 				_start_idle(h)
 			Human.State.TAKING:
 				_take_tick(h)
+			Human.State.ACTING:
+				_end_custom(h)
 	for h in _gone:
 		_humans.erase(h)
 		h.queue_free()
@@ -337,19 +229,19 @@ func _process(delta: float) -> void:
 func _update_crowd(delta: float) -> void:
 	_mood_left -= delta
 	if _mood_left <= 0.0:
-		_mood = exp(randf_range(-log(MOOD_SWING), log(MOOD_SWING)))
-		_mood_left = randf_range(MOOD_TIME.x, MOOD_TIME.y)
+		_mood = exp(randf_range(-log(tuning.mood_swing), log(tuning.mood_swing)))
+		_mood_left = randf_range(tuning.mood_time.x, tuning.mood_time.y)
 	if music.is_playing():
 		_silence = 0.0
 		if _humans.size() >= _max_humans:
 			return
-		var rate := ARRIVE_BASE + ARRIVE_PER_HUMAN * _humans.size()
+		var rate := tuning.arrive_base + tuning.arrive_per_human * _humans.size()
 		if _humans.is_empty() or randf() < rate * _mood * delta:
 			_spawn(1)
 		return
 	_silence += delta
 	var staying := _humans.filter(func(h): return h.goal != Human.Goal.LEAVE)
-	var rate := minf(LEAVE_RATE_GROWTH * _silence, LEAVE_RATE_MAX) * staying.size()
+	var rate := minf(tuning.leave_rate_growth * _silence, tuning.leave_rate_max) * staying.size()
 	if randf() < rate * _mood * delta:
 		var free := staying.filter(_can_leave)
 		if not free.is_empty():
@@ -387,17 +279,17 @@ func _pick_exit_target(h: Human) -> void:
 	h.target = Vector2i(clampi(h.cell.x, 2, _size.x - 3), _size.y - 1)
 
 
-## Walkable pixels above the UI, shared out AREA_PER_HUMAN each.
+## Walkable pixels above the UI, shared out tuning.area_per_human each.
 func _fit_count() -> int:
 	var area := 0
 	for y in _ui_top:
 		for x in _size.x:
 			if _is_walkable(Vector2i(x, y), true):
 				area += 1
-	return maxi(1, roundi(area / AREA_PER_HUMAN))
+	return maxi(1, roundi(area / tuning.area_per_human))
 
 
-## Starting crowd, from the sound's size (see START_EXTRA_PER).
+## Starting crowd, from the sound's size (see tuning.start_extra_per).
 func _start_count() -> int:
 	var px := 0
 	for y in _sound_img.get_height():
@@ -407,7 +299,7 @@ func _start_count() -> int:
 	var n := 0
 	while 3 * (n + 1) * (n + 1) - 5 * (n + 1) + 3 <= px:
 		n += 1
-	return mini(randi_range(n, n + START_EXTRA_PER * n), _max_humans)
+	return mini(randi_range(n, n + tuning.start_extra_per * n), _max_humans)
 
 
 ## Humans start off the grid and step onto a free spot on the bottom row
@@ -415,12 +307,12 @@ func _start_count() -> int:
 func _spawn(count: int) -> void:
 	for i in count:
 		var h := _new_human()
-		h.dealer = _spawned % DEALER_EVERY == 0
+		h.dealer = _spawned % tuning.dealer_every == 0
 		_spawned += 1
 		h.material = _dress()
 		h.visible = false
-		h.timer = randf() * SPAWN_DELAY
-		h.play("idle")
+		h.timer = randf() * tuning.spawn_delay
+		_act(h, &"idle")
 		_humans.append(h)
 		add_child(h)
 
@@ -430,12 +322,12 @@ func _dress() -> ShaderMaterial:
 	var spread := variation / DEFAULT_VARIATION
 	var tint := ShaderMaterial.new()
 	tint.shader = TINT_SHADER
-	tint.set_shader_parameter("lift", randf() * COLOR_VARIATION * spread)
+	tint.set_shader_parameter("lift", randf() * tuning.color_variation * spread)
 	var c: Color = DRESSCODES[dresscode]
-	if randf() < TINT_CHANCE * spread * spread:
-		c = Color.from_hsv(randf(), 1.0, TINT_STRENGTH)
+	if randf() < tuning.tint_chance * spread * spread:
+		c = Color.from_hsv(randf(), 1.0, tuning.tint_strength)
 	elif c.s > 0.0:
-		c.h = fposmod(c.h + randf_range(-1.0, 1.0) * DRESSCODE_HUE_SPREAD * variation, 1.0)
+		c.h = fposmod(c.h + randf_range(-1.0, 1.0) * tuning.dresscode_hue_spread * variation, 1.0)
 	tint.set_shader_parameter("tint", Vector3(c.r, c.g, c.b))
 	return tint
 
@@ -449,7 +341,8 @@ func _save_setting(key: String, value: Variant) -> void:
 
 func _new_human() -> Human:
 	var h := Human.new()
-	h.sprite_frames = _frames
+	h.skin = _pick_weighted(_skin_picks)
+	h.sprite_frames = _skins[h.skin].frames
 	h.centered = false
 	h.offset = BASE_OFFSET
 	return h
@@ -464,7 +357,7 @@ func _call_dj(_name: String) -> void:
 	_dj.cell = Vector2i(x, lane)
 	_dj.position = Vector2(_dj.cell)
 	_dj.path = [Vector2i(_dj_spot.x, lane), _dj_spot]
-	_dj.play("walk")
+	_act(_dj, &"walk")
 	_djs.append(_dj)
 	add_child(_dj)
 
@@ -482,7 +375,7 @@ func _dismiss_dj() -> void:
 	var x := -DJ_OFFSCREEN if randf() < 0.5 else _size.x - 1 + DJ_OFFSCREEN
 	_dj.path = [Vector2i(_dj.cell.x, lane), Vector2i(x, lane)]
 	_dj.timer = 0.0
-	_dj.play("walk")
+	_act(_dj, &"walk")
 	_dj = null
 
 
@@ -494,8 +387,8 @@ func _dj_at_booth() -> bool:
 func _pick_visit_target(h: Human) -> bool:
 	for i in 30:
 		var c := Vector2i(
-				_dj_spot.x + randi_range(-DJ_VISIT_SPREAD, DJ_VISIT_SPREAD),
-				_booth_rect.end.y + randi_range(0, DJ_VISIT_DEPTH))
+				_dj_spot.x + randi_range(-tuning.dj_visit_spread, tuning.dj_visit_spread),
+				_booth_rect.end.y + randi_range(0, tuning.dj_visit_depth))
 		if _is_walkable(c, true) and not _occupied.has(c):
 			h.target = c
 			return true
@@ -508,7 +401,7 @@ func _start_visit(h: Human) -> void:
 	if _dj.cell.x != h.cell.x:
 		h.flip_h = _dj.cell.x < h.cell.x
 	h.wave_dj = true
-	h.timer = randf_range(DJ_VISIT_LOOK.x, DJ_VISIT_LOOK.y)
+	h.timer = randf_range(tuning.dj_visit_look.x, tuning.dj_visit_look.y)
 
 
 func _process_djs(delta: float) -> void:
@@ -519,7 +412,7 @@ func _process_djs(delta: float) -> void:
 		d.timer -= delta
 		if d.timer > 0.0:
 			continue
-		d.timer = STEP_TIME
+		d.timer = tuning.step_time
 		var to := d.path[0]
 		var c := d.cell + (to - d.cell).sign()
 		if c.x != d.cell.x:
@@ -534,7 +427,7 @@ func _process_djs(delta: float) -> void:
 		if not d.path.is_empty():
 			continue
 		if d == _dj:
-			d.play("idle")
+			_act(d, &"idle")
 			music.start_set()
 		else:
 			_djs.erase(d)
@@ -555,27 +448,27 @@ func dj_touched(screen_point: Vector2) -> bool:
 ## Each scratch stroke jerks the DJ to another frame, held a moment so
 ## the set's frame changes don't cut in.
 func dj_scratch_stroke() -> void:
-	if not _dj_at_booth() or _dj.animation != "dj":
+	if not _dj_at_booth() or _dj.action != &"dj":
 		return
-	var f := randi_range(0, _frames.get_frame_count("dj") - 2)
+	var f := randi_range(0, _dj.sprite_frames.get_frame_count(_dj.animation) - 2)
 	_dj.frame = f + 1 if f >= _dj.frame else f
-	_dj.timer = DJ_FRAME_TIME.x
+	_dj.timer = tuning.dj_frame_time.x
 
 
 ## At the booth, while the set plays, the DJ shows a random DJ frame
 ## for a few seconds, then switches to a different one.
 func _dj_tick(d: Human, delta: float) -> void:
 	if not music.is_playing():
-		d.play("idle")
+		_act(d, &"idle")
 		return
-	if d.animation != "dj":
-		d.play("dj")
+	if d.action != &"dj":
+		_act(d, &"dj")
 		d.timer = 0.0
 	d.timer -= delta
 	if d.timer > 0.0:
 		return
-	d.timer = randf_range(DJ_FRAME_TIME.x, DJ_FRAME_TIME.y)
-	var f := randi_range(0, _frames.get_frame_count("dj") - 2)
+	d.timer = randf_range(tuning.dj_frame_time.x, tuning.dj_frame_time.y)
+	var f := randi_range(0, d.sprite_frames.get_frame_count(d.animation) - 2)
 	d.frame = f + 1 if f >= d.frame else f
 
 
@@ -596,26 +489,74 @@ func _try_place(h: Human) -> bool:
 	return false
 
 
-## Builds one skin's animations from the manifest. Each action plays its
-## first take for now. Manual takes (the DJ's) have fps 0: their frames
-## are picked by hand, so they never advance.
-func _load_frames(skin: String) -> SpriteFrames:
-	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(MANIFEST))
+## Builds every skin's animations from the manifest, one animation per
+## take, named "action:take". A skin with a base borrows the base's
+## actions it doesn't draw itself. Manual takes (the DJ's) have fps 0:
+## their frames are picked by hand, so they never advance.
+func _load_skins(manifest: Dictionary) -> void:
 	var size := Vector2i(int(manifest.frame_size[0]), int(manifest.frame_size[1]))
 	var palette := {}
 	for sym: String in manifest.palette:
 		palette[sym] = Color.html(manifest.palette[sym])
-	var frames := SpriteFrames.new()
-	frames.remove_animation(&"default")
-	var actions: Dictionary = manifest.skins[skin].actions
-	for action: String in actions:
-		var take: Dictionary = actions[action].takes[0]
-		frames.add_animation(action)
-		frames.set_animation_speed(action, take.fps)
-		frames.set_animation_loop(action, take.loop)
-		for f: Dictionary in take.frames:
-			frames.add_frame(action, _frame_texture(f.px, size, palette), f.hold)
-	return frames
+	var skins: Dictionary = manifest.skins
+	_base_skin = skins.keys()[0]
+	for skin: String in skins:
+		var frames := SpriteFrames.new()
+		frames.remove_animation(&"default")
+		var takes := {}
+		var actions := _skin_actions(skins, skin)
+		for action: String in actions:
+			takes[StringName(action)] = []
+			for take: Dictionary in actions[action].takes:
+				var anim := "%s:%s" % [action, take.name]
+				frames.add_animation(anim)
+				frames.set_animation_speed(anim, take.fps)
+				frames.set_animation_loop(anim, take.loop)
+				for f: Dictionary in take.frames:
+					frames.add_frame(anim, _frame_texture(f.px, size, palette), f.get("hold", 1))
+				takes[StringName(action)].append([StringName(anim), take.get("weight", 1)])
+		var weight: float = skins[skin].get("weight", 1)
+		_skins[skin] = {frames = frames, takes = takes}
+		if weight > 0.0:
+			_skin_picks.append([skin, weight])
+	_custom.clear()
+	var behaviours: Dictionary = manifest.get("behaviours", {})
+	for action: String in behaviours:
+		var b: Dictionary = behaviours[action]
+		if not _custom.has(b.trigger):
+			_custom[b.trigger] = []
+		_custom[b.trigger].append([StringName(action), b])
+
+
+## A skin's own actions on top of its base's, following bases all the way down.
+func _skin_actions(skins: Dictionary, skin: String) -> Dictionary:
+	var own: Dictionary = skins[skin].get("actions", {})
+	if not skins[skin].has("base"):
+		return own
+	return _skin_actions(skins, skins[skin].base).merged(own, true)
+
+
+## Plays one of the action's takes, picked by weight. A human already
+## doing the action keeps its take and only changes speed.
+func _act(h: Human, action: StringName, speed := 1.0) -> void:
+	var anim := h.animation
+	if h.action != action:
+		h.action = action
+		anim = _pick_weighted(_skins[h.skin].takes[action])
+	h.play(anim, speed)
+
+
+## Picks the first of a random [value, weight] pair, likelier the heavier.
+func _pick_weighted(pairs: Array) -> Variant:
+	var total := 0.0
+	for p: Array in pairs:
+		total += p[1]
+	var r := randf() * total
+	for p: Array in pairs:
+		r -= p[1]
+		if r < 0.0:
+			return p[0]
+	return pairs[-1][0]
 
 
 func _frame_texture(rows: Array, size: Vector2i, palette: Dictionary) -> ImageTexture:
@@ -628,12 +569,13 @@ func _frame_texture(rows: Array, size: Vector2i, palette: Dictionary) -> ImageTe
 	return ImageTexture.create_from_image(img)
 
 
-## Seconds a non-looping animation takes to play through at speed 1.
-func _anim_length(anim: StringName) -> float:
+## Seconds the human's current take lasts at speed 1, holds included.
+func _anim_length(h: Human) -> float:
+	var frames := h.sprite_frames
 	var beats := 0.0
-	for i in _frames.get_frame_count(anim):
-		beats += _frames.get_frame_duration(anim, i)
-	return beats / _frames.get_animation_speed(anim)
+	for i in frames.get_frame_count(h.animation):
+		beats += frames.get_frame_duration(h.animation, i)
+	return beats / frames.get_animation_speed(h.animation)
 
 
 ## Decides what an idle human does next.
@@ -641,7 +583,7 @@ func _choose(h: Human) -> void:
 	if h.erratic > 0.0:
 		_erratic_choose(h)
 		return
-	if h.has_deal and randf() < DEAL_TAKE_CHANCE:
+	if h.has_deal and randf() < tuning.deal_take_chance:
 		_go_take_deal(h)
 		return
 	if h.tired:
@@ -655,10 +597,12 @@ func _choose(h: Human) -> void:
 		return
 	if h.wave_dj:
 		h.wave_dj = false
-		if _dj_at_booth() and randf() < DJ_VISIT_WAVE_CHANCE:
+		if _dj_at_booth() and randf() < tuning.dj_visit_wave_chance:
 			_start_greet(h, _dj)
 			return
-	if _dj_at_booth() and randf() < DJ_VISIT_CHANCE and not _dj_zone_full(h) \
+	if _try_custom(h, "idle"):
+		return
+	if _dj_at_booth() and randf() < tuning.dj_visit_chance and not _dj_zone_full(h) \
 			and _pick_visit_target(h):
 		_start_walking(h, Human.Goal.VISIT_DJ)
 		return
@@ -667,7 +611,7 @@ func _choose(h: Human) -> void:
 		_start_walking(h, Human.Goal.STROLL)
 		return
 	var dancers := _humans.filter(func(o): return o.state == Human.State.DANCING).size()
-	var chance := minf(DANCE_CHANCE_BASE + DANCE_CHANCE_PER_DANCER * dancers, DANCE_CHANCE_MAX)
+	var chance := minf(tuning.dance_chance_base + tuning.dance_chance_per_dancer * dancers, tuning.dance_chance_max)
 	if randf() < chance:
 		_pick_dance_target(h)
 		_start_walking(h, Human.Goal.DANCE)
@@ -682,26 +626,26 @@ func _start_walking(h: Human, goal: Human.Goal) -> void:
 	h.stuck = 0
 	h.path.clear()
 	h.timer = 0.0
-	h.play("walk")
+	_act(h, h.walk_as if goal == Human.Goal.ACT else &"walk")
 
 
 func _start_idle(h: Human) -> void:
 	h.state = Human.State.IDLE
 	h.goal = Human.Goal.STROLL
-	var t := TIRED_IDLE_TIME if h.tired else IDLE_TIME
+	var t := tuning.tired_idle_time if h.tired else tuning.idle_time
 	h.timer = randf_range(t.x, t.y)
-	h.play("idle")
+	_act(h, &"idle")
 
 
 func _start_dance(h: Human) -> void:
 	h.state = Human.State.DANCING
-	h.dance_left = randf_range(DANCE_TIME.x, DANCE_TIME.y)
-	h.timer = DANCE_WEAR_TIME
-	h.play("dance")
+	h.dance_left = randf_range(tuning.dance_time.x, tuning.dance_time.y)
+	h.timer = tuning.dance_wear_time
+	_act(h, &"dance")
 
 
 func _dance_tick(h: Human) -> void:
-	if h.fatigue >= TIRED_AFTER or h.tired:
+	if h.fatigue >= tuning.tired_after or h.tired:
 		h.tired = true
 		h.rest = 0.0
 		_pick_rest_target(h)
@@ -710,10 +654,11 @@ func _dance_tick(h: Human) -> void:
 		# Pick again right away; a busy floor often pulls them back in.
 		h.state = Human.State.IDLE
 		h.timer = 0.0
-		h.play("idle")
+		_act(h, &"idle")
 	else:
 		_wear(h.cell)
-		h.timer = DANCE_WEAR_TIME
+		h.timer = tuning.dance_wear_time
+		_try_custom(h, "dancing")
 
 
 ## When the music stops, dancers and those heading to dance wander off.
@@ -723,8 +668,8 @@ func _on_music_changed(playing: bool) -> void:
 	for h in _humans:
 		if h.state == Human.State.DANCING:
 			h.state = Human.State.IDLE
-			h.timer = randf_range(0.0, IDLE_TIME.x)
-			h.play("idle")
+			h.timer = randf_range(0.0, tuning.idle_time.x)
+			_act(h, &"idle")
 		elif h.goal == Human.Goal.DANCE:
 			_pick_target(h)
 			h.goal = Human.Goal.STROLL
@@ -735,11 +680,11 @@ func _on_music_changed(playing: bool) -> void:
 ## everyone in the way. A path that ends short of an unreachable target
 ## counts as arriving.
 func _step(h: Human) -> void:
-	h.timer = STEP_TIME
+	h.timer = tuning.step_time
 	if h.erratic > 0.0:
-		var s := randf_range(ERRATIC_STEP.x, ERRATIC_STEP.y)
+		var s := randf_range(tuning.erratic_step.x, tuning.erratic_step.y)
 		h.timer *= s
-		h.play("walk", 1.0 / s)
+		_act(h, h.walk_as if h.goal == Human.Goal.ACT else &"walk", 1.0 / s)
 	if h.path.is_empty() or h.path_to != h.target:
 		_plan(h, false)
 	if h.cell == h.target or h.path.is_empty():
@@ -766,8 +711,8 @@ func _step(h: Human) -> void:
 ## Where a tired or erratic walker staggers to instead of next, or its own
 ## cell if it keeps to the path this step.
 func _wobble(h: Human, next: Vector2i) -> Vector2i:
-	var chance := ERRATIC_WOBBLE_CHANCE if h.erratic > 0.0 \
-			else TIRED_WOBBLE_CHANCE if h.tired else 0.0
+	var chance := tuning.erratic_wobble_chance if h.erratic > 0.0 \
+			else tuning.tired_wobble_chance if h.tired else 0.0
 	if randf() >= chance:
 		return h.cell
 	var d := next - h.cell
@@ -800,6 +745,9 @@ func _arrive(h: Human) -> void:
 		_start_take(h)
 	elif h.goal == Human.Goal.VISIT_DJ and _dj_at_booth():
 		_start_visit(h)
+	elif h.goal == Human.Goal.ACT:
+		h.goal = Human.Goal.STROLL
+		_end_custom(h)
 	elif h.entered:
 		_start_idle(h)
 	else:
@@ -810,7 +758,7 @@ func _arrive(h: Human) -> void:
 ## No way past the others right now: wait, then give up after a while.
 func _blocked(h: Human) -> void:
 	h.stuck += 1
-	if h.stuck < GIVE_UP_AFTER:
+	if h.stuck < tuning.give_up_after:
 		return
 	h.stuck = 0
 	if h.goal == Human.Goal.HANDOFF:
@@ -852,19 +800,25 @@ func _try_greet(h: Human) -> void:
 	if not _can_greet(h):
 		return
 	for o in _humans:
-		if o != h and _can_greet(o) and _dist(h.cell, o.cell) <= GREET_RADIUS:
+		if o != h and _can_greet(o) and _dist(h.cell, o.cell) <= tuning.greet_radius:
 			_greet_pair(h, o)
 			return
 
 
 ## Both wave; when one is a dealer, a deal may change hands after.
 func _greet_pair(h: Human, o: Human) -> void:
+	if _try_custom(h, "meeting", o):
+		for x: Human in [h, o]:
+			x.greet_cooldown = randf_range(tuning.greet_cooldown.x, tuning.greet_cooldown.y)
+		if o.state != Human.State.ACTING and o.goal != Human.Goal.ACT:
+			_start_greet(o, h)
+		return
 	_start_greet(h, o)
 	_start_greet(o, h)
 	var d := h if h.dealer else o
 	var r := o if d == h else h
 	if d.dealer and not r.dealer and not r.has_deal and not d.partner \
-			and randf() < DEAL_CHANCE:
+			and randf() < tuning.deal_chance:
 		d.partner = r
 		r.partner = d
 
@@ -872,7 +826,8 @@ func _greet_pair(h: Human, o: Human) -> void:
 func _can_greet(h: Human) -> bool:
 	# Passers-by don't stop for a chat by the booth.
 	return h.entered and h.greet_cooldown <= 0.0 and not _dj_zone.has_point(h.cell) \
-			and (h.state == Human.State.WALKING or h.state == Human.State.IDLE)
+			and (h.state == Human.State.WALKING or h.state == Human.State.IDLE) \
+			and h.goal != Human.Goal.ACT
 
 
 ## With no other, the human waves at nobody.
@@ -881,10 +836,10 @@ func _start_greet(h: Human, other: Human) -> void:
 	h.state = Human.State.GREETING
 	if other:
 		_face(h, other.cell)
-	var rate := DEALER_GREET_RATE if h.dealer else 1.0
-	h.greet_cooldown = randf_range(GREET_COOLDOWN.x, GREET_COOLDOWN.y) / rate
-	h.timer = _anim_length(&"wave") / rate
-	h.play("wave", rate)
+	var rate := tuning.dealer_greet_rate if h.dealer else 1.0
+	h.greet_cooldown = randf_range(tuning.greet_cooldown.x, tuning.greet_cooldown.y) / rate
+	_act(h, &"wave", rate)
+	h.timer = _anim_length(h) / rate
 
 
 ## Walkers carry on to their target; everyone else goes back to idling.
@@ -897,7 +852,7 @@ func _end_greet(h: Human) -> void:
 	elif h.resume_state == Human.State.WALKING:
 		h.state = Human.State.WALKING
 		h.timer = 0.0
-		h.play("walk")
+		_act(h, &"walk")
 	else:
 		_start_idle(h)
 
@@ -935,8 +890,8 @@ func _arrive_handoff(d: Human) -> void:
 func _wait_handoff(h: Human) -> void:
 	h.state = Human.State.HANDOFF
 	h.goal = Human.Goal.STROLL
-	h.timer = HANDOFF_WAIT
-	h.play("idle")
+	h.timer = tuning.handoff_wait
+	_act(h, &"idle")
 	var p := h.partner as Human
 	if p.state != Human.State.HANDOFF:
 		return
@@ -946,8 +901,8 @@ func _wait_handoff(h: Human) -> void:
 	p.partner = null
 	r.has_deal = true
 	r.state = Human.State.RECEIVING
-	r.timer = DEAL_RECEIVE_TIME
-	r.play("dealinhand")
+	r.timer = tuning.deal_receive_time
+	_act(r, &"dealinhand")
 
 
 ## Waited too long at the handoff; both sides drop it.
@@ -963,7 +918,7 @@ func _cancel_handoff(h: Human) -> void:
 
 ## Stops to take the deal, mostly stepping off the dance floor first.
 func _go_take_deal(h: Human) -> void:
-	if _on_dance_floor(h.cell) and randf() < DEAL_LEAVE_FLOOR_CHANCE:
+	if _on_dance_floor(h.cell) and randf() < tuning.deal_leave_floor_chance:
 		_pick_off_floor_target(h)
 		_start_walking(h, Human.Goal.TAKE_DEAL)
 	else:
@@ -973,39 +928,41 @@ func _go_take_deal(h: Human) -> void:
 func _start_take(h: Human) -> void:
 	h.state = Human.State.TAKING
 	h.goal = Human.Goal.STROLL
-	h.timer = DEAL_HOLD_TIME
-	h.play("dealinhand")
+	h.timer = tuning.deal_hold_time
+	_act(h, &"dealinhand")
 
 
 ## In hand, brought in, done; then the human goes erratic.
 func _take_tick(h: Human) -> void:
-	if h.animation == &"dealinhand":
-		h.play("deal_in")
-		h.timer = _anim_length(&"deal_in")
-	elif h.animation == &"deal_in":
-		h.play("doingthedeal")
-		h.timer = DEAL_TIME
+	if h.action == &"dealinhand":
+		_act(h, &"deal_in")
+		h.timer = _anim_length(h)
+	elif h.action == &"deal_in":
+		_act(h, &"doingthedeal")
+		h.timer = tuning.deal_time
 	else:
 		h.has_deal = false
-		h.erratic = randf_range(ERRATIC_TIME.x, ERRATIC_TIME.y)
+		h.erratic = randf_range(tuning.erratic_time.x, tuning.erratic_time.y)
 		_start_idle(h)
 		h.timer = 0.0
 
 
 ## Erratic humans do anything at random, ignoring the usual rules.
 func _erratic_choose(h: Human) -> void:
+	if _try_custom(h, "erratic"):
+		return
 	match randi() % 5:
 		0:
 			_start_dance(h)
-			h.dance_left = randf_range(ERRATIC_DANCE_TIME.x, ERRATIC_DANCE_TIME.y)
+			h.dance_left = randf_range(tuning.erratic_dance_time.x, tuning.erratic_dance_time.y)
 			return
 		1:
 			_start_idle(h)
-			h.timer = randf_range(ERRATIC_IDLE_TIME.x, ERRATIC_IDLE_TIME.y)
+			h.timer = randf_range(tuning.erratic_idle_time.x, tuning.erratic_idle_time.y)
 			return
 		2:
 			var near := _humans.filter(func(o): return o != h and _can_greet(o) \
-					and _dist(h.cell, o.cell) <= ERRATIC_GREET_RADIUS)
+					and _dist(h.cell, o.cell) <= tuning.erratic_greet_radius)
 			if near.is_empty():
 				_start_greet(h, null)
 			else:
@@ -1021,6 +978,63 @@ func _erratic_choose(h: Human) -> void:
 			h.target = c
 			break
 	_start_walking(h, Human.Goal.STROLL)
+
+
+## Rolls the manifest's own actions for trigger ("idle", "dancing",
+## "meeting" or "erratic"; see "behaviours" in humans.json) and starts the
+## first that comes up. Meeting other, a paired action has them join in.
+func _try_custom(h: Human, trigger: String, other: Human = null) -> bool:
+	for pair: Array in _custom.get(trigger, []):
+		var b: Dictionary = pair[1]
+		if randf() >= b.get("chance", 0.0):
+			continue
+		_start_custom(h, pair[0], b, other)
+		if other and b.get("paired", false):
+			_start_custom(other, pair[0], b, h)
+		return true
+	return false
+
+
+## Plays the action on the spot for its time, or once through when its
+## take doesn't loop. One that wanders walks a few pixels as the action
+## instead, and ends on arrival.
+func _start_custom(h: Human, action: StringName, b: Dictionary, other: Human) -> void:
+	h.resume_state = h.state
+	if other:
+		_face(h, other.cell)
+	if b.get("move", "still") == "wander" and _pick_wander_target(h):
+		h.walk_as = action
+		_start_walking(h, Human.Goal.ACT)
+		return
+	h.state = Human.State.ACTING
+	_act(h, action)
+	var t: Array = b.get("time", [2.0, 4.0])
+	var once := not h.sprite_frames.get_animation_loop(h.animation) \
+			and h.sprite_frames.get_animation_speed(h.animation) > 0.0
+	h.timer = _anim_length(h) if once else randf_range(t[0], t[1])
+
+
+## Back to what the human was doing; dancers dance on if the music does.
+func _end_custom(h: Human) -> void:
+	if h.resume_state == Human.State.DANCING and music.is_playing():
+		h.state = Human.State.DANCING
+		h.timer = tuning.dance_wear_time
+		_act(h, &"dance")
+	elif h.resume_state == Human.State.WALKING:
+		h.state = Human.State.WALKING
+		h.timer = 0.0
+		_act(h, &"walk")
+	else:
+		_start_idle(h)
+
+
+func _pick_wander_target(h: Human) -> bool:
+	for i in 20:
+		var c := h.cell + Vector2i(randi_range(-ACT_WANDER, ACT_WANDER), randi_range(-ACT_WANDER, ACT_WANDER))
+		if c != h.cell and _is_walkable(c, true) and not _occupied.has(c):
+			h.target = c
+			return true
+	return false
 
 
 func _face(h: Human, c: Vector2i) -> void:
@@ -1071,9 +1085,9 @@ func _pick_target(h: Human) -> void:
 	var zone_full := _dj_zone_full(h)
 	for i in 30:
 		var c: Vector2i
-		if not others.is_empty() and randf() < GROUP_CHANCE:
+		if not others.is_empty() and randf() < tuning.group_chance:
 			var o: Human = others.pick_random()
-			var r := randi_range(GROUP_RADIUS.x, GROUP_RADIUS.y)
+			var r := randi_range(tuning.group_radius.x, tuning.group_radius.y)
 			c = o.cell + Vector2i(randi_range(-r, r), randi_range(-r, r))
 		else:
 			c = Vector2i(randi_range(0, _size.x - 1), randi_range(0, _ui_top - 1))
@@ -1084,12 +1098,12 @@ func _pick_target(h: Human) -> void:
 	h.target = h.cell
 
 
-## True when h is around the booth with DJ_CROWD_MAX others already there.
+## True when h is around the booth with tuning.dj_crowd_max others already there.
 func _crowding_dj(h: Human) -> bool:
 	return _dj_zone.has_point(h.cell) and _dj_zone_full(h)
 
 
-## True when DJ_CROWD_MAX others already stand around the booth or are
+## True when tuning.dj_crowd_max others already stand around the booth or are
 ## on their way there.
 func _dj_zone_full(h: Human) -> bool:
 	var n := 0
@@ -1099,7 +1113,7 @@ func _dj_zone_full(h: Human) -> bool:
 		var spot := o.target if o.state == Human.State.WALKING else o.cell
 		if _dj_zone.has_point(spot):
 			n += 1
-			if n >= DJ_CROWD_MAX:
+			if n >= tuning.dj_crowd_max:
 				return true
 	return false
 
@@ -1117,12 +1131,12 @@ func _pick_dance_target(h: Human) -> void:
 			others.append(o.cell)
 		elif o.state == Human.State.WALKING and o.goal == Human.Goal.DANCE:
 			others.append(o.target)
-	var spacing := maxf(DANCE_SPACING_MIN, DANCE_SPACING_MAX - others.size())
+	var spacing := maxf(tuning.dance_spacing_min, tuning.dance_spacing_max - others.size())
 	var gaps: Array[float] = []
 	for o in others:
-		gaps.append(spacing * randf_range(DANCE_GAP_JITTER.x, DANCE_GAP_JITTER.y))
+		gaps.append(spacing * randf_range(tuning.dance_gap_jitter.x, tuning.dance_gap_jitter.y))
 	var radius := _dance_radius()
-	var reach := randf() * randf() * radius * DANCE_REACH_MAX
+	var reach := randf() * randf() * radius * tuning.dance_reach_max
 	var zone_full := _dj_zone_full(h)
 	var best := h.cell
 	var best_score := INF
@@ -1135,9 +1149,9 @@ func _pick_dance_target(h: Human) -> void:
 		if sd > radius:
 			continue
 		var score := absf(sd - reach) \
-				+ randf() * DANCE_SCORE_NOISE
+				+ randf() * tuning.dance_score_noise
 		for i in others.size():
-			score += maxf(0.0, gaps[i] - _dist(c, others[i])) * CROWD_WEIGHT
+			score += maxf(0.0, gaps[i] - _dist(c, others[i])) * tuning.crowd_weight
 		if score < best_score:
 			best_score = score
 			best = c
@@ -1166,20 +1180,20 @@ func _on_dance_floor(c: Vector2i) -> bool:
 
 ## How far from the sound the floor reaches with the current crowd.
 func _dance_radius() -> float:
-	return minf(DANCE_RADIUS_MAX, DANCE_RADIUS + DANCE_RADIUS_PER_HUMAN * _humans.size())
+	return minf(tuning.dance_radius_max, tuning.dance_radius + tuning.dance_radius_per_human * _humans.size())
 
 
 ## A spot far from the sound; wanders nearby if already far enough.
 func _pick_rest_target(h: Human) -> void:
-	var far := _sound_dist[h.cell.y * _size.x + h.cell.x] >= REST_DISTANCE
+	var far := _sound_dist[h.cell.y * _size.x + h.cell.x] >= tuning.rest_distance
 	for i in 30:
 		var c: Vector2i
 		if far:
-			c = h.cell + Vector2i(randi_range(-REST_WANDER, REST_WANDER), randi_range(-REST_WANDER, REST_WANDER))
+			c = h.cell + Vector2i(randi_range(-tuning.rest_wander, tuning.rest_wander), randi_range(-tuning.rest_wander, tuning.rest_wander))
 		else:
 			c = Vector2i(randi_range(0, _size.x - 1), randi_range(0, _ui_top - 1))
 		if _is_walkable(c, true) and not _occupied.has(c) \
-				and _sound_dist[c.y * _size.x + c.x] >= REST_DISTANCE:
+				and _sound_dist[c.y * _size.x + c.x] >= tuning.rest_distance:
 			h.target = c
 			return
 	h.target = h.cell
@@ -1206,7 +1220,7 @@ func _build_sound_map() -> void:
 				d2 = mini(d2, (c - s).length_squared())
 			var d := sqrt(d2)
 			_sound_dist[y * _size.x + x] = d
-			if d <= DANCE_RADIUS_MAX and c.y < _ui_top:
+			if d <= tuning.dance_radius_max and c.y < _ui_top:
 				_dance_spots.append(c)
 
 
@@ -1226,7 +1240,8 @@ func _is_walkable(c: Vector2i, above_ui: bool) -> bool:
 
 
 func _build_booth_cells(booth_used: Rect2i) -> void:
-	var body := _rgba(_frames.get_frame_texture(&"idle", 0).get_image())
+	var idle: StringName = _skins[_base_skin].takes[&"idle"][0][0]
+	var body := _rgba(_skins[_base_skin].frames.get_frame_texture(idle, 0).get_image())
 	var shape: Array[Vector2i] = []
 	for y in body.get_height():
 		for x in body.get_width():
@@ -1273,7 +1288,7 @@ func _make_grid(above_ui: bool) -> AStarGrid2D:
 		for x in _size.x:
 			var d: float = clear[y * _size.x + x]
 			if d > 0.0:
-				g.set_point_weight_scale(Vector2i(x, y), 1.0 + STROLL_PULL / d)
+				g.set_point_weight_scale(Vector2i(x, y), 1.0 + tuning.stroll_pull / d)
 	return g
 
 
