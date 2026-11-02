@@ -1,6 +1,6 @@
 # PocketRave
 
-A Godot 4 game.
+Music player rave simulator.
 
 ## License
 
